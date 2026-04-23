@@ -6,6 +6,8 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilte
 
 use app::routes::api_router;
 use app::config::AppConfig;
+use app::db::migrate::run_migrations;
+
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -17,6 +19,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     AppConfig::init().await?;  // Now async
     println!("DB host: {}", AppConfig::get().postgres.host);
+    run_migrations(AppConfig::pool()).await?;
 
 
     let app = api_router()
