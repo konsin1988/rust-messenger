@@ -6,8 +6,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilte
 
 use app::routes::api_router;
 use app::config::AppConfig;
-use app::db::migrate::run_migrations;
-
+use app::startup_checks::run_startup_checks;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -18,10 +17,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .init();
 
     AppConfig::init().await?;  // Now async
-    println!("DB host: {}", AppConfig::get().postgres.host);
-    run_migrations(AppConfig::pool()).await?;
-
-
+    run_startup_checks().await?;
+    
     let app = api_router()
         .layer(NormalizePathLayer::trim_trailing_slash())
         .layer(TraceLayer::new_for_http());
