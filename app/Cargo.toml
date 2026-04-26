@@ -14,3 +14,4 @@ tower-http = { version = "0.5", features = ["trace", "normalize-path"] }
 sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "postgres", "chrono", "migrate"] }  # For async SQL
 # diesel = { version = "2.2", features = ["postgres", "r2d2", "chrono"] }  # Typed ORM alt
 config = { version = "0.15", default-features = false, features = ["toml"] }
+scylla = "1.6.0"

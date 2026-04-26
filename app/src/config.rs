@@ -2,14 +2,23 @@ use config::{Config as ConfigCrate, ConfigError, Environment};  // Alias to avoi
 use serde::Deserialize;
 use sqlx::postgres::{PgPoolOptions, PgPool};
 use std::sync::{Arc, OnceLock};
+use scylla::client::session::{ Session };
+use scylla::client::session_builder::SessionBuilder;
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone)] 
 pub struct Database {
     pub host: String,
     pub port: u16,
     pub username: String,
     pub password: String,
     pub database: String,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct Cassandra {
+    pub contactpoint: String,
+    pub port: u16,
+    pub datacenter: String,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -31,11 +40,13 @@ pub struct Keycloak {
 #[derive(Debug, Deserialize, Clone)]  
 pub struct AppConfig {
     pub postgres: Database,
+    pub cassandra: Cassandra,
     pub redis: Redis,
 }
 
 pub static APP_CONFIG: OnceLock<AppConfig> = OnceLock::new();
 pub static DB_POOL: OnceLock<Arc<PgPool>> = OnceLock::new();
+pub static CASSANDRA_SESSION: OnceLock<Arc<Session>> = OnceLock::new();
 
 impl AppConfig {
     pub async fn init() -> Result<(), ConfigError> {
@@ -62,6 +73,11 @@ impl AppConfig {
             .map_err(|e| ConfigError::Message(e.to_string()))?;
         DB_POOL.set(Arc::new(pool)).map_err(|_| ConfigError::Message("DB_POOL set failed".into()))?;
 
+        // cassandra
+        init_cassandra(&cfg.cassandra)
+            .await
+            .map_err(|e| ConfigError::Message(e.to_string()))?;
+
         Ok(())
     }
 
@@ -72,5 +88,30 @@ impl AppConfig {
     pub fn pool() -> &'static Arc<PgPool> {
         DB_POOL.get().expect("DB pool not initialized")
     }
+
+    pub fn cassandra() -> &'static Arc<Session> {
+        CASSANDRA_SESSION
+            .get()
+            .expect("Cassandra session not initialized")
+    }
+}
+
+pub async fn init_cassandra(cfg: &Cassandra) -> Result<(), Box<dyn std::error::Error>> {
+    let contact_point = format!(
+        "{}:{}",
+        cfg.contactpoint,
+        cfg.port
+    );
+
+    let session = SessionBuilder::new()
+        .known_node(contact_point)
+        .build()
+        .await?;
+
+    CASSANDRA_SESSION
+        .set(Arc::new(session))
+        .map_err(|_| "Cassandra already initialized")?;
+
+    Ok(())
 }
 
