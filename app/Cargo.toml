@@ -17,3 +17,4 @@ config = { version = "0.15", default-features = false, features = ["toml"] }
 scylla = "1.6.0"
 aws-config = "1.8.16"
 aws-sdk-s3 = "1.131.0"
+deadpool-redis = "0.16"

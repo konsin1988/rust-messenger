@@ -8,6 +8,8 @@ use aws_sdk_s3::Client;
 use aws_config::meta::region::RegionProviderChain;
 use aws_sdk_s3::config::Region;
 use aws_sdk_s3::config::Credentials;
+use deadpool_redis::{Config, Runtime, Pool as RedisPool };
+
 
 #[derive(Debug, Deserialize, Clone)] 
 pub struct Postgres {
@@ -34,14 +36,6 @@ pub struct Redis {
 }
 
 #[derive(Debug, Deserialize, Clone)]
-pub struct Keycloak {
-    pub client_id: String,
-    pub client_secret: String,
-    pub realm: String,
-    pub url: String,
-}
-
-#[derive(Debug, Deserialize, Clone)]
 pub struct Rustfs {
     pub endpoint_url: String,
     pub access_key: String,
@@ -61,6 +55,7 @@ pub static APP_CONFIG: OnceLock<AppConfig> = OnceLock::new();
 pub static DB_POOL: OnceLock<Arc<PgPool>> = OnceLock::new();
 pub static CASSANDRA_SESSION: OnceLock<Arc<Session>> = OnceLock::new();
 pub static S3_CLIENT: OnceLock<Arc<Client>> = OnceLock::new();
+pub static CACHE: OnceLock<RedisPool> = OnceLock::new();
 
 impl AppConfig {
     pub async fn init() -> Result<(), ConfigError> {
@@ -86,6 +81,10 @@ impl AppConfig {
             .await
             .map_err(|e| ConfigError::Message(e.to_string()))?;
 
+        init_redis_pool(&cfg.redis)
+            .await
+            .map_err(|e| ConfigError::Message(e.to_string()))?;
+
         Ok(())
     }
 
@@ -107,6 +106,12 @@ impl AppConfig {
         S3_CLIENT
             .get()
             .expect("S3 Client not initialized")
+    }
+
+    pub fn redis() -> &'static RedisPool {
+        CACHE
+            .get()
+            .expect("Redis pool not initialized")
     }
 
 }
@@ -174,6 +179,23 @@ pub async fn init_s3_client(cfg: &Rustfs) -> Result<(), Box<dyn std::error::Erro
     S3_CLIENT
         .set(Arc::new(client))
         .map_err(|_| ConfigError::Message("S3 client already initialized".into()))?;
+
+    Ok(())
+}
+
+pub async fn init_redis_pool(redis: &Redis) -> Result<(), Box<dyn std::error::Error>>{
+    let url = format!(
+        "redis://:{password}@{host}:{port}/",
+        password = redis.password,
+        host = redis.host,
+        port = redis.port,
+    );
+    let cfg = Config::from_url(url);
+
+    let redis_pool = cfg.create_pool(Some(Runtime::Tokio1))
+        .expect("Failed to create Redis pool");
+    CACHE.set(redis_pool)
+        .expect("Redis pool already initialized");
 
     Ok(())
 }
