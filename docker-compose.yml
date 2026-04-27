@@ -46,6 +46,7 @@ services:
     restart: unless-stopped
     ports:
       - "9000:9000"
+      - "9001:9001"
     env_file: .env
     volumes:
       - ./volumes/rustfs_data/data:/data
@@ -94,7 +95,26 @@ services:
       dockerfile: ./docker/rust/Dockerfile.dev
     container_name: rust-server
     image: konsin1988/messenger-rust-server
-    env_file: .env
+    environment:
+      - POSTGRES__DATABASE=${POSTGRES_DATABASE}
+      - POSTGRES__USERNAME=${POSTGRES_USERNAME}
+      - POSTGRES__PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES__HOST=${POSTGRES_HOST}
+      - POSTGRES__PORT=${POSTGRES_PORT}
+      - REDIS__HOST=${REDIS_HOST}
+      - REDIS__PORT=${REDIS_PORT}
+      - REDIS__PASSWORD=${REDIS_PASSWORD}
+      - REDIS__TTL=${REDIS_TTL}
+      - RUSTFS__ENDPOINT_URL=${RUSTFS_ENDPOINT_URL}
+      - RUSTFS__ACCESS_KEY=${RUSTFS_ACCESS_KEY}
+      - RUSTFS__SECRET_KEY=${RUSTFS_SECRET_KEY}
+      - RUSTFS__DATA_DIR=${RUSTFS_DATA_DIR}
+      - CASSANDRA__CONTACT_POINT=${CASSANDRA_CONTACT_POINT}
+      - CASSANDRA__PORT=${CASSANDRA_PORT}
+      - CASSANDRA__CLUSTER_NAME=${CASSANDRA_CLUSTER_NAME}
+      - CASSANDRA__DATACENTER=${CASSANDRA_DATACENTER}
+      - CASSANDRA__RACK=${CASSANDRA_RACK}
+      - CASSANDRA__ENDPOINT_SNITCH=${CASSANDRA_ENDPOINT_SNITCH}
     ports:
       - "3000:3000"
     volumes:

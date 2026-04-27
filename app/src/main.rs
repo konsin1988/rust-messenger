@@ -6,7 +6,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilte
 
 use app::routes::api_router;
 use app::config::AppConfig;
-use app::startup_checks::run_startup_checks;
+use app::bootstrap::run_startup_checks;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
