@@ -1,5 +1,5 @@
 use axum::{Router, routing::get};
-use crate::handlers::health::{health_handler, ready_handler};
+use crate::interfaces::http::handlers::health::{health_handler, ready_handler};
 
 pub fn health_router() -> Router{
     Router::new()

@@ -4,8 +4,8 @@ use tokio::net::TcpListener;
 use tower_http::{trace::TraceLayer, normalize_path::NormalizePathLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
-use app::routes::api_router;
-use app::config::AppConfig;
+use app::interfaces::http::routes::api_router;
+use app::shared::config::AppConfig;
 use app::bootstrap::run_startup_checks;
 
 #[tokio::main]

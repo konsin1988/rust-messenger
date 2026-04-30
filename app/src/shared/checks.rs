@@ -1,4 +1,4 @@
-use crate::config::AppConfig;
+use crate::shared::config::AppConfig;
 use sqlx::query_as;
 use tokio::time::{timeout, Duration};
 

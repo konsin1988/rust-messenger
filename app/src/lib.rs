@@ -1,8 +1,7 @@
-pub mod handlers;
 pub mod bootstrap;
-pub mod routes;
-pub mod models;
-pub mod errors;
-pub mod config;
 pub mod db;
-pub mod checks;
+pub mod application;
+pub mod domain;
+pub mod infrastructure;
+pub mod interfaces;
+pub mod shared;

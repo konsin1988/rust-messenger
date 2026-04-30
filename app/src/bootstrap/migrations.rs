@@ -1,4 +1,4 @@
-use crate::config::AppConfig;
+use crate::shared::config::AppConfig;
 use crate::db::migrate::{ run_postgres_migrations, run_cassandra_migrations };
 
 pub async fn run_migrations() -> Result<(), Box<dyn std::error::Error>> {

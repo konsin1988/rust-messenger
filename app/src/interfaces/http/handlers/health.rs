@@ -1,6 +1,6 @@
 use axum::{Json, http::StatusCode, response::IntoResponse};
 use serde_json::json;
-use crate::checks::{ check_postgres, check_cassandra, check_rustfs, check_redis };
+use crate::shared::checks::{ check_postgres, check_cassandra, check_rustfs, check_redis };
 use tokio::join;
 
 pub async fn health_handler() -> Json<serde_json::Value> {

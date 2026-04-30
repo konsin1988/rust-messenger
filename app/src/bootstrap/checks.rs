@@ -1,4 +1,4 @@
-use crate::checks::{ check_postgres, check_cassandra, check_rustfs, check_redis };
+use crate::shared::checks::{ check_postgres, check_cassandra, check_rustfs, check_redis };
 
 pub async fn run_checks() -> Result<(), Box<dyn std::error::Error>> {
     check_postgres().await?;

@@ -1,4 +1,4 @@
-use crate::config::AppConfig;
+use crate::shared::config::AppConfig;
 
 pub async fn create_buckets() -> Result<(), Box<dyn std::error::Error>> {
     let buckets = vec![
