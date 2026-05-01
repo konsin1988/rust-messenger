@@ -1,6 +1,11 @@
 use axum::{Json, http::StatusCode, response::IntoResponse};
 use serde_json::json;
-use crate::shared::checks::{ check_postgres, check_cassandra, check_rustfs, check_redis };
+use crate::infrastructure::{
+    postgres::check::check_postgres,
+    cassandra::check::check_cassandra,
+    cache::check::check_cache,
+    s3::check::check_s3,
+};
 use tokio::join;
 
 pub async fn health_handler() -> Json<serde_json::Value> {
@@ -11,8 +16,8 @@ pub async fn ready_handler() ->  impl IntoResponse {
     let (pg, cass, rustfs, redis) = join!(
         async { check_postgres().await.is_ok() },
         async { check_cassandra().await.is_ok() },
-        async { check_rustfs().await.is_ok() },
-        async { check_redis().await.is_ok() },
+        async { check_s3().await.is_ok() },
+        async { check_cache().await.is_ok() },
     );
 
     let all_ok = pg && cass && rustfs && redis;

@@ -1,5 +1,5 @@
 use config::{Config as ConfigCrate, ConfigError, Environment};  // Alias to avoid conflict
-use serde::Deserialize;
+use serde::{Deserialize, Deserializer};
 use sqlx::postgres::{PgPoolOptions, PgPool};
 use std::sync::{Arc, OnceLock};
 use scylla::client::session::{ Session };
@@ -41,6 +41,16 @@ pub struct Rustfs {
     pub access_key: String,
     pub secret_key: String,
     pub data_dir: String,
+    #[serde(deserialize_with = "deserialize_buckets")]
+    pub buckets: Vec<String>, 
+}
+
+fn deserialize_buckets<'de, D>(deserializer: D) -> Result<Vec<String>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s: String = Deserialize::deserialize(deserializer)?;
+    Ok(s.split(",").map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect())
 }
 
 #[derive(Debug, Deserialize, Clone)]  

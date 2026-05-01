@@ -1,15 +1,7 @@
-use sqlx::PgPool;
 use scylla::client::session::Session;
 use std::path::Path;
 use tokio::fs;
 
-pub async fn run_postgres_migrations(pool: &PgPool) -> Result<(), sqlx::Error> {
-    sqlx::migrate!("./migrations")
-        .run(pool)
-        .await?;
-    println!("### Postgres migrations run successfully ###");
-    Ok(())
-}
 
 pub async fn run_cassandra_migrations(session: &Session) -> Result<(), Box<dyn std::error::Error>> {
     let path = Path::new("cassandra/migrations");
