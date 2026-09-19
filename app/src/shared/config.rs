@@ -10,7 +10,6 @@ use aws_sdk_s3::config::Region;
 use aws_sdk_s3::config::Credentials;
 use deadpool_redis::{Config, Runtime, Pool as RedisPool };
 
-
 #[derive(Debug, Deserialize, Clone)] 
 pub struct Postgres {
     pub host: String,

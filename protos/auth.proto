@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package auth;
+
+service AuthService {
+  rpc StartAuth(StartAuthRequest) returns (StartAuthResponse);
+  rpc VerifyCode(VerifyCodeRequest) returns (AuthResponse);
+}
+
+message StartAuthRequest {
+  string phone = 1;
+}
+
+message StartAuthResponse {
+  bool sent = 1;
+}
+
+message VerifyCodeRequest {
+  string phone = 1;
+  string code = 2;
+}
+
+message AuthResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}
