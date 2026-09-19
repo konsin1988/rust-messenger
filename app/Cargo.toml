@@ -4,17 +4,26 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-axum = "0.7"
-tokio = { version = "1", features = ["full"] }
+axum = "0.7"        # The HTTP Host (for GraphQL only) 
+tonic = "0.14.5"    # Core gRPC library
+prost = "0.14"      # Required for Protocol Buffer serialization
+async-graphql = { version = "7.0", features = ["chrono", "dataloader"] }    # GraphQL (User Info/Profiles) 
+async-graphql-axum = "7.0"                                                  # Integrates GraphQL with Axum
+tokio = { version = "1.51", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tower-http = { version = "0.5", features = ["trace", "normalize-path"] }
 sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "postgres", "chrono", "migrate"] }  # For async SQL
-# diesel = { version = "2.2", features = ["postgres", "r2d2", "chrono"] }  # Typed ORM alt
 config = { version = "0.15", default-features = false, features = ["toml"] }
 scylla = "1.6.0"
 aws-config = "1.8.16"
 aws-sdk-s3 = "1.131.0"
 deadpool-redis = "0.16"
+jsonwebtoken = "10.3"
+chrono = "0.4"
+
+[build-dependencies]
+tonic-build = "0.14.5"        # Required for code generation from .proto files
+tonic-prost-build = "0.14.5"  # For configuration and compilation

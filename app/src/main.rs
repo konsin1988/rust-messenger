@@ -18,6 +18,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     AppConfig::init().await?;  // Now async
     run_startup_checks().await?;
+
+    // 2. Interfaces: Setup GraphQL Schema
+    //let schema = interfaces::graphql::create_schema(pg_pool.clone());
+
+    // 3. Orchestration: Start both servers
+    //let grpc_task = tokio::spawn(infrastructure::server::run_grpc(scylla));
+    //let gql_task = tokio::spawn(infrastructure::server::run_graphql(schema));
+
+    //let _ = tokio::try_join!(grpc_task, gql_task);
     
     let app = api_router()
         .layer(NormalizePathLayer::trim_trailing_slash())

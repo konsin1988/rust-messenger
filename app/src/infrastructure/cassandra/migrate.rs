@@ -4,7 +4,7 @@ use tokio::fs;
 
 
 pub async fn run_cassandra_migrations(session: &Session) -> Result<(), Box<dyn std::error::Error>> {
-    let path = Path::new("cassandra/migrations");
+    let path = Path::new("./cassandra/migrations");
 
     let mut entries = fs::read_dir(path).await?;
     let mut files = Vec::new();

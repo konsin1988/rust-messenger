@@ -1,14 +1,22 @@
-FROM rust:1.80-slim AS builder
+FROM rust:1.91-bookworm AS builder
+
+RUN apt-get update && \
+    apt-get install -y protobuf-compiler pkg-config libssl-dev && \
+    rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 COPY ./app /app
+COPY ./protos /app/protos
 
 RUN cargo build --release
 
 FROM debian:bookworm-slim
-WORKDIR /app
-
-COPY --from:builder /app/target/release/app.
 
 RUN apt-get update && apt-get install -y libssl3 ca-certificates && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY --from=builder /app/target/release/app .
+
 CMD ["./app"]
 
